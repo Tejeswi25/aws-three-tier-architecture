@@ -21,7 +21,7 @@ resource "aws_security_group" "app_sg" {
 }
 
 resource "aws_instance" "app_server" {
-    ami = "ami-0df7a207adb894a1f"
+    ami = "ami-060e277c0d4cce553"
     instance_type = "t3.micro"
     subnet_id = var.subnet_id
     vpc_security_group_ids = [aws_security_group.app_sg.id]
