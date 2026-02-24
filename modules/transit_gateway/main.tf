@@ -2,6 +2,7 @@ variable "tgw_name" {}
 variable "hub_vpc_id" {}
 variable "hub_subnet_id" {}
 variable "app_vpc_id"{}
+variable "app_subnet_id" {}
 
 resource "aws_ec2_transit_gateway" "this"{
     description = "Singapore Hub TGW"
