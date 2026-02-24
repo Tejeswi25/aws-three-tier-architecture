@@ -75,7 +75,7 @@ resource "aws_route_table" "app_private" {
 resource "aws_route" "hub_to_internet_via_tgw" {
   route_table_id = aws_route_table.app_private.id 
   destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id = module.transit_gateway.tgw_id
+  transit_gateway_id = var.tgw_id
 }
 
 
