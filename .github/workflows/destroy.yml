@@ -19,7 +19,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Destroy 
-        working-directory: ./terraform 
+        working-directory: ./
         run: |
           terraform init 
           terraform destroy -auto-approve 
