@@ -15,6 +15,10 @@ variable "azs" {
   type = list(string)
 }
 
+variable "tgw_id" {
+  
+}
+
 resource "aws_vpc" "VPC" {
   cidr_block = var.vpc_cidr
   enable_dns_hostnames = true 
@@ -79,7 +83,7 @@ resource "aws_route" "hub_to_internet_via_tgw" {
 resource "aws_route" "hub_to_app_via_tgw" {
    route_table_id = aws_route_table.hub_public.id 
    destination_cidr_block = "10.0.0.0/16"
-   transit_gateway_id = module.transit_gateway.tgw_id
+   transit_gateway_id = var.tgw_id
 }
 
 

@@ -5,6 +5,7 @@ module "hub_vpc" {
   public_subnet_cidr  = "10.10.0.0/24"
   private_subnet_cidr = []
   azs                 = ["ap-southeast-1a"]
+  tgw_id              = module.transit_gateway.tgw_id
 }
 
 # App VPC (Productive Workload)
@@ -15,6 +16,7 @@ module "app_vpc" {
   public_subnet_cidr  = "10.0.1.0/24"
   private_subnet_cidr = ["10.0.2.0/24", "10.0.3.0/24"]
   azs                 = ["ap-southeast-1a", "ap-southeast-1b"]
+  tgw_id              = module.transit_gateway.tgw_id
 }
 
 module "tgw" {
