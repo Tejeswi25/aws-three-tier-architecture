@@ -28,4 +28,4 @@ resource "aws_instance" "app_server" {
     tags = { Name = var.instance_name }
 }
 
-output "instance_id" { value = aws_instance.app_Server.id }
+output "instance_id" { value = aws_instance.app_server.id }

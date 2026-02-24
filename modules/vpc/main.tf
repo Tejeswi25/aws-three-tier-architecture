@@ -58,13 +58,13 @@ resource "aws_nat_gateway" "this" {
 }
 
 resource "aws_route_table" "hub_public" {
-   vpc_id = aws_vpc.hub_vpc.id 
+   vpc_id = aws_vpc.VPC.id 
    tags = { Name = "Hub-Public-RT"}
 }
 
 
 resource "aws_route_table" "app_private" {
-  vpc_id = aws_vpc.app_vpc.id 
+  vpc_id = aws_vpc.VPC.id
   tags = { Name = "App-VPC-RT" }
 }
 
