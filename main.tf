@@ -50,3 +50,9 @@ resource "aws_route" "hub_to_app_via_tgw" {
   destination_cidr_block = module.app_vpc.vpc_cidr
   transit_gateway_id     = module.tgw.tgw_id
 }
+
+resource "aws_route" "spoke_to_tgw"{
+    route_table_id = module.app_vpc.private_route_table_id
+    destination_cidr_block = "0.0.0.0/0"
+    transit_gateway_id = module.tgw.tgw_id
+}
