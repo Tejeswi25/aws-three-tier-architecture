@@ -38,7 +38,7 @@ module "app_server" {
 
 module "rds" {
   source        = "./modules/database"
-  db_name       = "Productiondb"
+  db_name       = "productiondb"
   vpc_id        = module.app_vpc.vpc_id
   db_subnet_ids = module.app_vpc.private_subnet_ids
   app_vpc_cidr  = module.app_vpc.vpc_cidr
