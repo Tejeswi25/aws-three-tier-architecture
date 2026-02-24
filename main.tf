@@ -5,7 +5,7 @@ module "hub_vpc" {
   public_subnet_cidr  = "10.10.0.0/24"
   private_subnet_cidr = []
   azs                 = ["ap-southeast-1a"]
-  tgw_id              = module.transit_gateway.tgw_id
+
 }
 
 # App VPC (Productive Workload)
@@ -16,7 +16,7 @@ module "app_vpc" {
   public_subnet_cidr  = "10.0.1.0/24"
   private_subnet_cidr = ["10.0.2.0/24", "10.0.3.0/24"]
   azs                 = ["ap-southeast-1a", "ap-southeast-1b"]
-  tgw_id              = module.transit_gateway.tgw_id
+
 }
 
 module "tgw" {
@@ -27,6 +27,7 @@ module "tgw" {
   app_vpc_id    = module.app_vpc.vpc_id
   app_subnet_id = module.app_vpc.private_subnet_ids[0]
 }
+
 
 module "app_server" {
   source        = "./modules/EC2"
@@ -42,4 +43,10 @@ module "rds" {
   db_subnet_ids = module.app_vpc.private_subnet_ids
   app_vpc_cidr  = module.app_vpc.vpc_cidr
   db_password   = var.db_password
+}
+
+resource "aws_route" "hub_to_app_via_tgw" {
+  route_table_id         = module.hub_vpc.public_route_table_id
+  destination_cidr_block = module.app_vpc.vpc_cidr
+  transit_gateway_id     = module.tgw.tgw_id
 }

@@ -15,9 +15,7 @@ variable "azs" {
   type = list(string)
 }
 
-variable "tgw_id" {
-  
-}
+
 
 resource "aws_vpc" "VPC" {
   cidr_block = var.vpc_cidr
@@ -61,30 +59,35 @@ resource "aws_nat_gateway" "this" {
    tags = { Name = "${var.vpc_name}-nat"}
 }
 
-resource "aws_route_table" "hub_public" {
+resource "aws_route_table" "Public" {
    vpc_id = aws_vpc.VPC.id 
-   tags = { Name = "Hub-Public-RT"}
+   tags = { Name = "${var.vpc_name}-Public-RT"}
 }
 
 
-resource "aws_route_table" "app_private" {
+resource "aws_route_table" "private" {
   vpc_id = aws_vpc.VPC.id
-  tags = { Name = "App-VPC-RT" }
+  tags = { Name = "${var.vpc_name}-Private-RT" }
 }
 
-resource "aws_route" "hub_to_internet_via_tgw" {
-  route_table_id = aws_route_table.app_private.id 
+resource "aws_route" "private_to_internet" {
+  route_table_id         = aws_route_table.private.id
   destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id = var.tgw_id
+  nat_gateway_id         = var.vpc_name == "Singapore-Hub" ? aws_nat_gateway.this[0].id : null 
+}
+
+resource "aws_route_table_association" "public_assoc" {
+  subnet_id      = aws_subnet.Public.id
+  route_table_id = aws_route_table.Public.id
+}
+
+resource "aws_route_table_association" "private_assoc" {
+  count          = length(aws_subnet.private)
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private.id
 }
 
 
-
-resource "aws_route" "hub_to_app_via_tgw" {
-   route_table_id = aws_route_table.hub_public.id 
-   destination_cidr_block = "10.0.0.0/16"
-   transit_gateway_id = var.tgw_id
-}
 
 
   
@@ -92,4 +95,6 @@ output "vpc_id" { value = aws_vpc.VPC.id }
 output "public_subnet_id" { value = aws_subnet.Public.id }
 output "private_subnet_ids" { value = aws_subnet.private[*].id }
 output "vpc_cidr" { value = aws_vpc.VPC.cidr_block } 
-output "aws_internet_gateway_id" { value = aws_internet_gateway.this.id }
+output "igw_id" { value = aws_internet_gateway.this.id }
+output "public_route_table_id" { value = aws_route_table.Public.id }
+output "private_route_table_id" { value = aws_route_table.private.id }
