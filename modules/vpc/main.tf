@@ -71,9 +71,10 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route" "private_to_internet" {
+  count                  = var.vpc_name == "Singapore-Hub" ? 1 : 0 
   route_table_id         = aws_route_table.private.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = var.vpc_name == "Singapore-Hub" ? aws_nat_gateway.this[0].id : null 
+  nat_gateway_id         = aws_nat_gateway.this[0].id
 }
 
 resource "aws_route_table_association" "public_assoc" {
