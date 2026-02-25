@@ -110,11 +110,7 @@ resource "aws_nat_gateway" "hub_nat" {
 
 
 
-resource "aws_ec2_transit_gateway_vpc_attachment" "hub_attach" {
-  vpc_id             = module.hub_vpc.vpc_id
-  subnet_ids         = [aws_subnet.hub_tgw_attach.id] # Use the new one!
-  transit_gateway_id = module.tgw.tgw_id
-}
+
 
 resource "aws_route_table" "hub_tgw_redirect_rt" {
   vpc_id = module.hub_vpc.vpc_id
@@ -131,3 +127,4 @@ resource "aws_route_table_association" "tgw_redirect" {
   subnet_id      = aws_subnet.hub_tgw_attach.id
   route_table_id = aws_route_table.hub_tgw_redirect_rt.id
 }
+
