@@ -46,14 +46,46 @@ module "rds" {
   db_password   = var.db_password
 }
 
-resource "aws_route" "hub_to_app_via_tgw" {
-  route_table_id         = module.hub_vpc.public_route_table_id
-  destination_cidr_block = module.app_vpc.vpc_cidr
-  transit_gateway_id     = module.tgw.tgw_id
+resource "aws_route_table" "app_private" {
+  vpc_id = module.app_vpc.vpc_id
+  route {
+    cidr_block = "0.0.0.0/0"
+    transit_gateway_id = module.transit_gateway.tgw_id
+  }
+  tags = { Name = "App-Private-RT"}
 }
 
-resource "aws_route" "spoke_to_tgw"{
-    route_table_id = module.app_vpc.private_route_table_id
-    destination_cidr_block = "0.0.0.0/0"
-    transit_gateway_id = module.tgw.tgw_id
+resource "aws_route_table_association" "app_private_assoc" {
+   count = length(module.app_vpc.private_subnet_ids)
+   subnet_id = module.app_vpc.private_subnet_ids[count.index]
+   route_table_id = aws_route_table.app_private.id 
 }
+
+resource "aws_internet_gateway" "hub_igw" {
+  vpc_id = module.hub_vpc.vpc_id
+  tags = {
+    Name = "SingaporeHub-igw"
+  }
+}
+resource "aws_route_table" "hub_public_rt" {
+  vpc_id = module.hub_vpc.vpc_id 
+  # This route sends NAT Gateway traffic out to the internet
+  route{
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.hub_igw.id
+  }
+
+  # This route sends return traffic back to your App VPC via TGW
+  route {
+    cidr_block = "10.0.0.0/16"
+    transit_gateway_id = module.transit_gateway.tgw_id
+  }
+  tags = { Name = "Hub-Public-RT" }
+}
+
+resource "aws_route_table_association" "hub_public_assoc" {
+  subnet_id      = module.hub_vpc.public_subnet_id
+  route_table_id = aws_route_table.hub_public_rt.id
+}
+
+
