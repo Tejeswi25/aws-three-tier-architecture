@@ -17,14 +17,20 @@ module "app_vpc" {
   public_subnet_cidr  = "10.0.1.0/24"
   private_subnet_cidr = ["10.0.2.0/24", "10.0.3.0/24"]
   azs                 = ["ap-southeast-1a", "ap-southeast-1b"]
+}
 
+resource "aws_subnet" "hub_tgw_attach" {
+  vpc_id            = module.hub_vpc.vpc_id
+  cidr_block        = "10.10.1.0/28" # A small slice of your Hub CIDR
+  availability_zone = "ap-southeast-1a"
+  tags              = { Name = "Hub-TGW-Attachment-Subnet" }
 }
 
 module "tgw" {
   source        = "./modules/transit_gateway"
   tgw_name      = "Central-TGW"
   hub_vpc_id    = module.hub_vpc.vpc_id
-  hub_subnet_id = module.hub_vpc.public_subnet_id
+  hub_subnet_id = aws_subnet.hub_tgw_attach.id 
   app_vpc_id    = module.app_vpc.vpc_id
   app_subnet_id = module.app_vpc.private_subnet_ids[0]
 }
@@ -102,3 +108,26 @@ resource "aws_nat_gateway" "hub_nat" {
   tags = { Name = "singaporehub-vpc-nat-gateway"}
 }
 
+
+
+resource "aws_ec2_transit_gateway_vpc_attachment" "hub_attach" {
+  vpc_id             = module.hub_vpc.vpc_id
+  subnet_ids         = [aws_subnet.hub_tgw_attach.id] # Use the new one!
+  transit_gateway_id = module.tgw.tgw_id
+}
+
+resource "aws_route_table" "hub_tgw_redirect_rt" {
+  vpc_id = module.hub_vpc.vpc_id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.hub_nat.id # Force traffic into NAT
+  }
+
+  tags = { Name = "Hub-TGW-Redirect-to-NAT" }
+}
+
+resource "aws_route_table_association" "tgw_redirect" {
+  subnet_id      = aws_subnet.hub_tgw_attach.id
+  route_table_id = aws_route_table.hub_tgw_redirect_rt.id
+}

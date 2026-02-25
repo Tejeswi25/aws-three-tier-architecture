@@ -10,14 +10,6 @@ resource "aws_ec2_transit_gateway" "this"{
 }
 
 
-resource "aws_ec2_transit_gateway_vpc_attachment" "hub_attach" {
-    vpc_id = var.hub_vpc_id
-    subnet_ids = [var.hub_subnet_id]
-    transit_gateway_id = aws_ec2_transit_gateway.this.id 
-    
-
-    tags = { Name = "hub-attachment" } 
-}
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "app_attach" {
     subnet_ids = [var.app_subnet_id ]
