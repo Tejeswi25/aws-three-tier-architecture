@@ -50,7 +50,7 @@ resource "aws_iam_instance_profile" "ec2_ssm_profile" {
     role = aws_iam_role.ec2_ssm_role.name 
 }
 resource "aws_instance" "app_server" {
-    ami = "ami-060e277c0d4cce553"
+    ami = "ami-0ac0e4288aa341886"
     instance_type = "t3.micro"
     iam_instance_profile = aws_iam_instance_profile.ec2_ssm_profile.name 
     subnet_id = var.subnet_id
