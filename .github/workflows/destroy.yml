@@ -18,9 +18,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Terraform Init
+        run: terraform init 
+
+      # Optional: Highy recommended to see what's happening first
+      - name: Terraform Plan Destroy
+        run: terraform plan -destroy
+
       - name: Terraform Destroy 
-        working-directory: ./
-        run: |
-          terraform init 
-          terraform destroy -auto-approve 
+        run: terraform destroy -auto-approve
     
