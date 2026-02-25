@@ -50,7 +50,7 @@ resource "aws_route_table" "app_private" {
   vpc_id = module.app_vpc.vpc_id
   route {
     cidr_block = "0.0.0.0/0"
-    transit_gateway_id = module.transit_gateway.tgw_id
+    transit_gateway_id = module.tgw.tgw_id
   }
   tags = { Name = "App-Private-RT"}
 }
@@ -78,7 +78,7 @@ resource "aws_route_table" "hub_public_rt" {
   # This route sends return traffic back to your App VPC via TGW
   route {
     cidr_block = "10.0.0.0/16"
-    transit_gateway_id = module.transit_gateway.tgw_id
+    transit_gateway_id = module.tgw.tgw_id
   }
   tags = { Name = "Hub-Public-RT" }
 }
