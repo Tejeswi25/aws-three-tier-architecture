@@ -42,26 +42,6 @@ resource "aws_subnet" "private" {
 }
 
 
-
-
-# Only create an Elastic IP and NAT gateway if VPC name is "Singapore-Hub"
-
-resource "aws_eip" "nat" {
-  count = var.vpc_name == "Singapore-Hub" ? 1 : 0
-  domain = "vpc"
-}
-
-resource "aws_nat_gateway" "this" {
-   count = var.vpc_name == "Singapore-Hub" ? 1 : 0 
-   allocation_id = aws_eip.nat[0].id 
-   subnet_id = aws_subnet.Public.id 
-   tags = { Name = "${var.vpc_name}-nat"}
-}
-
-
-
-
-  
 output "vpc_id" { value = aws_vpc.VPC.id }
 output "public_subnet_id" { value = aws_subnet.Public.id }
 output "private_subnet_ids" { value = aws_subnet.private[*].id }

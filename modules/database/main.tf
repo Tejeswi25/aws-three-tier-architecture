@@ -5,7 +5,7 @@ variable "app_vpc_cidr" {}
 variable "db_password" { sensitive = true }
 
 resource "aws_db_subnet_group" "this" {
-    name = "${var.db_name}-sng"
+    name = "${var.db_name}-sng1"
     subnet_ids = var.db_subnet_ids
 }
 

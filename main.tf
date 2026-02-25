@@ -88,4 +88,17 @@ resource "aws_route_table_association" "hub_public_assoc" {
   route_table_id = aws_route_table.hub_public_rt.id
 }
 
+# Reserve a public static IP for the NAT gateway
+
+resource "aws_eip" "nat_eip" {
+  domain = "vpc"
+  tags = { Name = "Hub-VPC-nat-eip"}
+}
+
+resource "aws_nat_gateway" "hub_nat" {
+  allocation_id = aws_eip.nat_eip.id 
+  subnet_id = module.hub_vpc.public_subnet_id
+  depends_on = [aws_internet_gateway.hub_igw]
+  tags = { Name = "singaporehub-vpc-nat-gateway"}
+}
 
